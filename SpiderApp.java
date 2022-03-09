@@ -23,29 +23,25 @@ public class SpiderApp {
 		scanner.close();
 		
 		crawler.addtopagestogo(ans);
-		crawler.addPagesVisited("http://bing.com");
-		while ((crawler.getPagestogo().size() < 800)) {
+		
+		do  {
+			crawler.addPagesVisited(crawler.getPagestogo().get(0));
+			crawler.incrVisitCount();
 			try {
-				crawler.incrVisitCount();
-				
-				if ( (crawler.getPagestogo().get(0).length() < 10) || !(crawler.getPagestogo().get(0).substring(0, 4).equals("http"))) {
-					crawler.getPagestogo().remove(0);
-					continue;
-				}
-				crawler.addPagesVisited(crawler.getPagestogo().get(0));
-				
 				Document document = Jsoup.connect(crawler.getPagestogo().remove(0)).get();
 				Elements urls = document.select("a[href]");
 				for (Element link: urls) {
+					if (!( (link.attr("href")).contains("https://") )) {
+						continue;
+					}
 					crawler.addtopagestogo(link.attr("href"));
 				}
-				
-				
 			}
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		} while (!(crawler.getPagestogo().isEmpty()));
+		
 		
 		System.out.println(crawler.toString());
 		
